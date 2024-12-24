@@ -37,17 +37,17 @@ const MaintenanceForm = ({ onSubmit }: MaintenanceFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.date || !formData.kilometers || !formData.category) {
+    if (!formData.kilometers || !formData.category) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please fill in kilometers and category",
         variant: "destructive",
       });
       return;
     }
 
     onSubmit({
-      date: new Date(formData.date),
+      ...(formData.date && { date: new Date(formData.date) }),
       kilometers: Number(formData.kilometers),
       category: formData.category,
       notes: formData.notes,
@@ -69,7 +69,7 @@ const MaintenanceForm = ({ onSubmit }: MaintenanceFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <label className="text-sm font-medium">Date</label>
+        <label className="text-sm font-medium">Date (Optional)</label>
         <Input
           type="date"
           value={formData.date}
@@ -78,20 +78,22 @@ const MaintenanceForm = ({ onSubmit }: MaintenanceFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Kilometers</label>
+        <label className="text-sm font-medium">Kilometers *</label>
         <Input
           type="number"
           value={formData.kilometers}
           onChange={(e) => setFormData({ ...formData, kilometers: e.target.value })}
           placeholder="Enter current kilometers"
+          required
         />
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Category</label>
+        <label className="text-sm font-medium">Category *</label>
         <Select
           value={formData.category}
           onValueChange={(value) => setFormData({ ...formData, category: value as MaintenanceCategory })}
+          required
         >
           <SelectTrigger>
             <SelectValue placeholder="Select category" />
