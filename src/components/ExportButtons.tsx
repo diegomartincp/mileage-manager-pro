@@ -3,7 +3,7 @@ import { MaintenanceRecord } from "@/types/maintenance";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { useRef } from "react";
-import { toPDF } from "react-to-pdf";
+import generatePDF from "react-to-pdf";
 
 interface ExportButtonsProps {
   records: MaintenanceRecord[];
@@ -35,7 +35,7 @@ const ExportButtons = ({ records }: ExportButtonsProps) => {
 
   const exportToPDF = () => {
     if (targetRef.current) {
-      toPDF(targetRef, {
+      generatePDF(targetRef, {
         filename: "maintenance-records.pdf",
       });
     }
