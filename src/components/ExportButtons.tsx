@@ -2,13 +2,16 @@ import { Button } from "@/components/ui/button";
 import { MaintenanceRecord } from "@/types/maintenance";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
-import ReactToPDF from "react-to-pdf";
+import { useRef } from "react";
+import { toPDF } from "react-to-pdf";
 
 interface ExportButtonsProps {
   records: MaintenanceRecord[];
 }
 
 const ExportButtons = ({ records }: ExportButtonsProps) => {
+  const targetRef = useRef<HTMLDivElement>(null);
+
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       records.map((record) => ({
@@ -30,18 +33,22 @@ const ExportButtons = ({ records }: ExportButtonsProps) => {
     saveAs(data, "maintenance-records.xlsx");
   };
 
+  const exportToPDF = () => {
+    if (targetRef.current) {
+      toPDF(targetRef, {
+        filename: "maintenance-records.pdf",
+      });
+    }
+  };
+
   return (
     <div className="space-x-2">
       <Button onClick={exportToExcel} variant="outline">
         Export to Excel
       </Button>
-      <ReactToPDF targetRef="maintenance-records" filename="maintenance-records.pdf">
-        {({ toPdf }: { toPdf: () => void }) => (
-          <Button onClick={toPdf} variant="outline">
-            Export to PDF
-          </Button>
-        )}
-      </ReactToPDF>
+      <Button onClick={exportToPDF} variant="outline">
+        Export to PDF
+      </Button>
     </div>
   );
 };
