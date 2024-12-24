@@ -19,7 +19,13 @@ interface MaintenanceChartsProps {
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d"];
 
 const MaintenanceCharts = ({ records }: MaintenanceChartsProps) => {
-  const sortedRecords = [...records].sort((a, b) => a.date.getTime() - b.date.getTime());
+  // Sort by kilometers if no date, otherwise by date
+  const sortedRecords = [...records].sort((a, b) => {
+    if (!a.date && !b.date) return a.kilometers - b.kilometers;
+    if (!a.date) return 1;  // Records without dates go last
+    if (!b.date) return -1; // Records without dates go last
+    return a.date.getTime() - b.date.getTime();
+  });
 
   const categoryData = records.reduce((acc, record) => {
     acc[record.category] = (acc[record.category] || 0) + 1;
@@ -40,11 +46,15 @@ const MaintenanceCharts = ({ records }: MaintenanceChartsProps) => {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="date"
-              tickFormatter={(date) => new Date(date).toLocaleDateString()}
+              tickFormatter={(date) => 
+                date ? new Date(date).toLocaleDateString() : "No Date"
+              }
             />
             <YAxis dataKey="kilometers" />
             <Tooltip
-              labelFormatter={(label) => new Date(label).toLocaleDateString()}
+              labelFormatter={(label) => 
+                label ? new Date(label).toLocaleDateString() : "No Date"
+              }
             />
             <Line
               type="monotone"
