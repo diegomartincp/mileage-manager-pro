@@ -27,7 +27,9 @@ const MaintenanceTable = ({ records }: MaintenanceTableProps) => {
         <TableBody>
           {records.map((record) => (
             <TableRow key={record.id}>
-              <TableCell>{record.date.toLocaleDateString()}</TableCell>
+              <TableCell>
+                {record.date ? record.date.toLocaleDateString() : "-"}
+              </TableCell>
               <TableCell>{record.kilometers.toLocaleString()}</TableCell>
               <TableCell>{record.category}</TableCell>
               <TableCell>{record.notes}</TableCell>

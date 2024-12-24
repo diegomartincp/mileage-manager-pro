@@ -8,7 +8,7 @@ export type MaintenanceCategory =
 
 export interface MaintenanceRecord {
   id?: number;
-  date: Date;
+  date?: Date;
   kilometers: number;
   category: MaintenanceCategory;
   notes: string;
