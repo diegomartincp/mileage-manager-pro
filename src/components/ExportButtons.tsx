@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { MaintenanceRecord } from "@/types/maintenance";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
-import { toPDF } from "react-to-pdf";
+import ReactToPDF from "react-to-pdf";
 
 interface ExportButtonsProps {
   records: MaintenanceRecord[];
@@ -30,23 +30,18 @@ const ExportButtons = ({ records }: ExportButtonsProps) => {
     saveAs(data, "maintenance-records.xlsx");
   };
 
-  const exportToPDF = () => {
-    const options = {
-      filename: "maintenance-records.pdf",
-      page: { margin: 20 },
-    };
-    
-    toPDF("maintenance-records", options);
-  };
-
   return (
     <div className="space-x-2">
       <Button onClick={exportToExcel} variant="outline">
         Export to Excel
       </Button>
-      <Button onClick={exportToPDF} variant="outline">
-        Export to PDF
-      </Button>
+      <ReactToPDF targetRef="maintenance-records" filename="maintenance-records.pdf">
+        {({ toPdf }: { toPdf: () => void }) => (
+          <Button onClick={toPdf} variant="outline">
+            Export to PDF
+          </Button>
+        )}
+      </ReactToPDF>
     </div>
   );
 };
