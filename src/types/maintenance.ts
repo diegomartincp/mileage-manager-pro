@@ -12,4 +12,6 @@ export interface MaintenanceRecord {
   kilometers: number;
   category: MaintenanceCategory;
   notes: string;
+  cost: number;
+  attachments?: File[];
 }

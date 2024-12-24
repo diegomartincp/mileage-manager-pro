@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { MaintenanceCategory, MaintenanceRecord } from "@/types/maintenance";
 import { useToast } from "@/components/ui/use-toast";
+import { Upload } from "lucide-react";
 
 interface MaintenanceFormProps {
   onSubmit: (record: MaintenanceRecord) => void;
@@ -32,15 +33,34 @@ const MaintenanceForm = ({ onSubmit }: MaintenanceFormProps) => {
     kilometers: "",
     category: "" as MaintenanceCategory,
     notes: "",
+    cost: "",
+    attachments: [] as File[],
   });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setFormData((prev) => ({
+        ...prev,
+        attachments: [...prev.attachments, ...newFiles],
+      }));
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      attachments: prev.attachments.filter((_, i) => i !== index),
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.kilometers || !formData.category) {
+    if (!formData.kilometers || !formData.category || !formData.cost) {
       toast({
         title: "Error",
-        description: "Please fill in kilometers and category",
+        description: "Please fill in kilometers, category, and cost",
         variant: "destructive",
       });
       return;
@@ -51,6 +71,8 @@ const MaintenanceForm = ({ onSubmit }: MaintenanceFormProps) => {
       kilometers: Number(formData.kilometers),
       category: formData.category,
       notes: formData.notes,
+      cost: Number(formData.cost),
+      attachments: formData.attachments,
     });
 
     setFormData({
@@ -58,6 +80,8 @@ const MaintenanceForm = ({ onSubmit }: MaintenanceFormProps) => {
       kilometers: "",
       category: "" as MaintenanceCategory,
       notes: "",
+      cost: "",
+      attachments: [],
     });
 
     toast({
@@ -89,6 +113,18 @@ const MaintenanceForm = ({ onSubmit }: MaintenanceFormProps) => {
       </div>
 
       <div className="space-y-2">
+        <label className="text-sm font-medium">Cost *</label>
+        <Input
+          type="number"
+          value={formData.cost}
+          onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
+          placeholder="Enter maintenance cost"
+          required
+          step="0.01"
+        />
+      </div>
+
+      <div className="space-y-2">
         <label className="text-sm font-medium">Category *</label>
         <Select
           value={formData.category}
@@ -115,6 +151,46 @@ const MaintenanceForm = ({ onSubmit }: MaintenanceFormProps) => {
           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
           placeholder="Add any additional notes"
         />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Attachments</label>
+        <div className="flex flex-col gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => document.getElementById('file-upload')?.click()}
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Upload Files
+          </Button>
+          <Input
+            id="file-upload"
+            type="file"
+            className="hidden"
+            onChange={handleFileChange}
+            multiple
+            accept=".pdf,image/*"
+          />
+          {formData.attachments.length > 0 && (
+            <div className="space-y-2">
+              {formData.attachments.map((file, index) => (
+                <div key={index} className="flex items-center justify-between p-2 border rounded">
+                  <span className="truncate">{file.name}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeFile(index)}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <Button type="submit" className="w-full">

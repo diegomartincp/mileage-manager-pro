@@ -10,6 +10,8 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
+  BarChart,
+  Bar,
 } from "recharts";
 
 interface MaintenanceChartsProps {
@@ -32,9 +34,19 @@ const MaintenanceCharts = ({ records }: MaintenanceChartsProps) => {
     return acc;
   }, {} as Record<string, number>);
 
+  const costByCategoryData = records.reduce((acc, record) => {
+    acc[record.category] = (acc[record.category] || 0) + record.cost;
+    return acc;
+  }, {} as Record<string, number>);
+
   const pieData = Object.entries(categoryData).map(([name, value]) => ({
     name,
     value,
+  }));
+
+  const costData = Object.entries(costByCategoryData).map(([name, value]) => ({
+    name,
+    cost: value,
   }));
 
   return (
@@ -88,6 +100,30 @@ const MaintenanceCharts = ({ records }: MaintenanceChartsProps) => {
             </Pie>
             <Tooltip />
           </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="h-[300px]">
+        <h3 className="text-lg font-medium mb-2">Cost by Category</h3>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={costData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip
+              formatter={(value) => 
+                `$${Number(value).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`
+              }
+            />
+            <Bar dataKey="cost" fill="#8884d8">
+              {costData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Bar>
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </div>
